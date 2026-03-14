@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-dark: #2d3e34;
+    --brand-primary: #5c7c64;
+    --brand-light: #f8f5f0;
+    --brand-accent: #d4a373;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased text-[#2d3e34] bg-[#f8f5f0];
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  .btn-premium {
+    @apply px-8 py-3 rounded-full font-bold transition-all duration-300 transform active:scale-95 shadow-lg flex items-center justify-center gap-2;
+  }
+
+  .btn-primary {
+    @apply bg-[#2d3e34] text-white hover:bg-[#1f2b24] hover:shadow-xl;
+  }
+
+  .btn-outline {
+    @apply border-2 border-[#2d3e34] text-[#2d3e34] hover:bg-[#2d3e34] hover:text-white;
+  }
+
+  .card-ecommerce {
+    @apply bg-white rounded-[2rem] p-5 shadow-sm border border-transparent hover:shadow-2xl hover:border-white transition-all duration-500;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom Animations */
+@keyframes slow-zoom {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-slow-zoom {
+  animation: slow-zoom 20s infinite alternate linear;
+}
+
+.gradient-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+}
