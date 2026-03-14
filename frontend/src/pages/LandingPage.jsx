@@ -76,6 +76,21 @@ export const LandingPage = () => {
                 </div>
             </section>
 
+            {/* Sign Up / Login CTA */}
+            <section className="flex flex-col items-center justify-center">
+                <motion.button
+                    onClick={() => navigate('/login')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-10 py-4 bg-gradient-to-r from-[#5c7c64] to-[#3d5a44] text-white text-lg font-bold rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 tracking-wide"
+                >
+                    Sign Up / Login
+                </motion.button>
+                <p className="mt-4 text-gray-500 text-sm md:text-base italic tracking-wide">
+                    Sign in to view all products &amp; prices
+                </p>
+            </section>
+
             {/* Themed Sections */}
             <section className="container mx-auto px-6 py-20 space-y-32">
                 {/* Family Theme */}

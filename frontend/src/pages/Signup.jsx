@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ChevronRight, Apple, Heart, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, ChevronRight, Apple, Heart, ArrowLeft, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export const Signup = () => {
@@ -9,9 +9,28 @@ export const Signup = () => {
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const validatePassword = (password) => {
+        const hasMinLength = password.length >= 6;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        
+        if (!hasMinLength) return "Password must be at least 6 characters long.";
+        if (!hasUpperCase) return "Password must contain at least one uppercase letter.";
+        if (!hasNumber) return "Password must contain at least one number.";
+        return null;
+    };
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        
+        const validationError = validatePassword(formData.password);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
         setLoading(true);
         setError(null);
         const { error } = await supabase.auth.signUp({
@@ -20,7 +39,7 @@ export const Signup = () => {
             options: { data: { full_name: formData.name } }
         });
         if (error) setError(error.message);
-        else navigate('/home');
+        else navigate('/verify-email', { state: { email: formData.email } });
         setLoading(false);
     };
 
@@ -76,13 +95,31 @@ export const Signup = () => {
                         <div className="relative group">
                             <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#5c7c64] transition-colors w-5 h-5" />
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 required
-                                className="w-full bg-[#f8f5f0]/50 border-none rounded-2xl py-5 pl-16 pr-6 focus:ring-4 focus:ring-[#5c7c64]/10 transition-all outline-none text-sm placeholder:text-gray-400"
+                                className="w-full bg-[#f8f5f0]/50 border-none rounded-2xl py-5 pl-16 pr-14 focus:ring-4 focus:ring-[#5c7c64]/10 transition-all outline-none text-sm placeholder:text-gray-400"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#5c7c64] transition-colors"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                        </div>
+                        <div className="px-4 flex flex-wrap gap-x-4 gap-y-1">
+                             <p className={`text-[10px] font-bold flex items-center gap-1 ${formData.password.length >= 6 ? 'text-[#5c7c64]' : 'text-gray-300'}`}>
+                                 {formData.password.length >= 6 ? '✓' : '○'} Min 6 chars
+                             </p>
+                             <p className={`text-[10px] font-bold flex items-center gap-1 ${/[A-Z]/.test(formData.password) ? 'text-[#5c7c64]' : 'text-gray-300'}`}>
+                                 {/[A-Z]/.test(formData.password) ? '✓' : '○'} One Uppercase
+                             </p>
+                             <p className={`text-[10px] font-bold flex items-center gap-1 ${/[0-9]/.test(formData.password) ? 'text-[#5c7c64]' : 'text-gray-300'}`}>
+                                 {/[0-9]/.test(formData.password) ? '✓' : '○'} One Number
+                             </p>
                         </div>
                     </div>
 

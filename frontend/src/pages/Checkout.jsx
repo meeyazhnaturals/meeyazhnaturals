@@ -150,7 +150,7 @@ export const Checkout = () => {
                 <p className="text-gray-400 text-sm mb-10 max-w-[280px]">Explore our natural collections and add wellness to your routine.</p>
                 
                 <Link 
-                    to="/home" 
+                    to="/login" 
                     className="w-full max-w-[320px] bg-[#5c7c64] text-white py-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-[#4a6452] transition-all transform active:scale-95 mb-12"
                 >
                     Continue Shopping
@@ -175,10 +175,37 @@ export const Checkout = () => {
         window.scrollTo(0, 0);
     };
 
-    const handleFinalize = () => {
-        // Here we would call the Payment API or Order API
-        setStep(4);
-        clearCart();
+    const handleFinalize = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session?.user) {
+                const orderData = {
+                    user_id: session.user.id,
+                    items: cart,
+                    total_amount: finalTotal,
+                    shipping_address: formData,
+                    status: 'Delivering',
+                    created_at: new Date()
+                };
+
+                const { error } = await supabase
+                    .from('orders')
+                    .insert([orderData]);
+
+                if (error) {
+                    console.error("Error saving order:", error.message);
+                    // We still show the success screen to the user but log the error
+                }
+            }
+            
+            setStep(4);
+            clearCart();
+        } catch (err) {
+            console.error("Critical error during finalization:", err);
+            setStep(4);
+            clearCart();
+        }
     };
 
     const shippingCharge = 60;
@@ -421,14 +448,7 @@ export const Checkout = () => {
                                     <span className="text-3xl font-bold text-[#2d3e34] tracking-tighter">₹{finalTotal}</span>
                                 </div>
                             </div>
-                            <div className="bg-[#f8f5f0] p-6 rounded-2xl border border-gray-100 space-y-3">
-                                <div className="flex items-center gap-3 text-xs font-bold text-[#5c7c64]">
-                                    <ShieldCheck className="w-4 h-4" /> 100% Secure Checkout
-                                </div>
-                                <div className="flex items-center gap-3 text-xs font-bold text-gray-400">
-                                    <Truck className="w-4 h-4" /> Arrives by Friday, Mar 14
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>

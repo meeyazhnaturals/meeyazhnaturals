@@ -122,7 +122,10 @@ export const Profile = () => {
                                 <button className="w-full px-6 py-4 bg-[#f8f5f0] rounded-2xl flex items-center gap-4 text-[#5c7c64] font-bold text-sm transition-all group">
                                     <User className="w-5 h-5" /> Account Details
                                 </button>
-                                <button className="w-full px-6 py-4 hover:bg-[#f8f5f0] rounded-2xl flex items-center gap-4 text-gray-400 hover:text-[#5c7c64] font-bold text-sm transition-all group">
+                                <button 
+                                    onClick={() => navigate('/my-orders')}
+                                    className="w-full px-6 py-4 hover:bg-[#f8f5f0] rounded-2xl flex items-center gap-4 text-gray-400 hover:text-[#5c7c64] font-bold text-sm transition-all group"
+                                >
                                     <Package className="w-5 h-5" /> My Orders
                                 </button>
                                 <button 

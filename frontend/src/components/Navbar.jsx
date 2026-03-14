@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
 
 export const Navbar = () => {
-    const { cart, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
+    const { cart, cartCount, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart();
     const location = useLocation();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,8 +25,11 @@ export const Navbar = () => {
         });
 
         // Listen for changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             setUser(session?.user ?? null);
+            if (event === 'SIGNED_OUT') {
+                clearCart();
+            }
         });
 
         return () => {
@@ -84,7 +87,7 @@ export const Navbar = () => {
 
                 {/* Center: Brand Name (Neater, Smaller) */}
                 <Link
-                    to="/"
+                    to={user ? "/home" : "/"}
                     onClick={() => { setIsMenuOpen(false); setIsCartOpen(false); }}
                     className="flex flex-col items-center group"
                 >
@@ -247,7 +250,7 @@ export const Navbar = () => {
                                     <p className="text-gray-400 text-sm mb-10 max-w-[240px] shrink-0">Explore our natural collections and add wellness to your routine.</p>
 
                                     <Link
-                                        to="/home"
+                                        to="/login"
                                         onClick={() => setIsCartOpen(false)}
                                         className="w-full bg-[#5c7c64] text-white py-5 rounded-[1.5rem] font-bold shadow-lg hover:bg-[#4a6452] transition-all transform active:scale-95 mb-12 shrink-0 text-center"
                                     >
@@ -337,7 +340,7 @@ export const Navbar = () => {
                                             Checkout <ChevronRight className="w-4 h-4" />
                                         </Link>
                                         <Link
-                                            to="/home"
+                                            to="/login"
                                             onClick={() => setIsCartOpen(false)}
                                             className="w-full text-center text-sm text-gray-400 hover:text-[#5c7c64] font-medium transition-colors block py-2"
                                         >

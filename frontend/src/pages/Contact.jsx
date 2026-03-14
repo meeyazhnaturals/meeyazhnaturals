@@ -5,37 +5,41 @@ import { Mail, Phone, MapPin, Send, Instagram, MessageCircle, Clock, Loader2 } f
 export const Contact = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+    });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
+        setError('');
+        try {
+            const res = await fetch('http://localhost:8080/api/contact/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setSubmitted(true);
+                setFormData({ name: '', email: '', subject: '', message: '' });
+            } else {
+                setError(data.message || 'Failed to send message. Please try again.');
+            }
+        } catch (err) {
+            setError('Could not connect to the server. Please try again later.');
+        } finally {
             setIsSubmitting(false);
-            setSubmitted(true);
-        }, 1500);
+        }
     };
 
     return (
-        <div className="bg-[#f8f5f0] min-h-screen pt-32 pb-24 font-sans">
+        <div className="bg-[#f8f5f0] min-h-screen pt-12 pb-24 font-sans">
             <div className="container mx-auto px-6 max-w-6xl">
-                <div className="text-center mb-20">
-                    <motion.span 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#5c7c64] mb-4 block"
-                    >
-                        Get in Touch
-                    </motion.span>
-                    <motion.h1 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="font-serif text-5xl md:text-6xl font-bold text-[#2d3e34]"
-                    >
-                        We'd Love to <span className="italic font-medium opacity-80 underline decoration-[#5c7c64]/20 underline-offset-8">Hear From You</span>
-                    </motion.h1>
-                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
                     
@@ -137,11 +141,19 @@ export const Contact = () => {
                                     <h3 className="font-serif text-2xl font-bold text-[#2d3e34] mb-2">Send us a Message</h3>
                                     <p className="text-gray-400 text-sm mb-10 italic">Have a question about our natural products? Fill out the form below.</p>
                                     
+                                    {error && (
+                                        <div className="bg-red-50 text-red-600 text-sm p-4 rounded-2xl border border-red-100">
+                                            {error}
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-[#5c7c64] ml-2">Full Name</label>
                                             <input 
                                                 required 
+                                                value={formData.name}
+                                                onChange={(e) => setFormData({...formData, name: e.target.value})}
                                                 placeholder="Enter your name"
                                                 className="w-full bg-[#f8f5f0] border-transparent rounded-[1.5rem] p-5 focus:ring-4 focus:ring-[#5c7c64]/5 outline-none transition-all shadow-sm" 
                                             />
@@ -151,6 +163,8 @@ export const Contact = () => {
                                             <input 
                                                 required 
                                                 type="email" 
+                                                value={formData.email}
+                                                onChange={(e) => setFormData({...formData, email: e.target.value})}
                                                 placeholder="Enter your email"
                                                 className="w-full bg-[#f8f5f0] border-transparent rounded-[1.5rem] p-5 focus:ring-4 focus:ring-[#5c7c64]/5 outline-none transition-all shadow-sm" 
                                             />
@@ -161,6 +175,8 @@ export const Contact = () => {
                                         <label className="text-[10px] font-bold uppercase tracking-widest text-[#5c7c64] ml-2">Subject</label>
                                         <input 
                                             required 
+                                            value={formData.subject}
+                                            onChange={(e) => setFormData({...formData, subject: e.target.value})}
                                             placeholder="What is this regarding?"
                                             className="w-full bg-[#f8f5f0] border-transparent rounded-[1.5rem] p-5 focus:ring-4 focus:ring-[#5c7c64]/5 outline-none transition-all shadow-sm" 
                                         />
@@ -171,6 +187,8 @@ export const Contact = () => {
                                         <textarea 
                                             required 
                                             rows="5"
+                                            value={formData.message}
+                                            onChange={(e) => setFormData({...formData, message: e.target.value})}
                                             placeholder="Tell us how we can help..."
                                             className="w-full bg-[#f8f5f0] border-transparent rounded-[1.5rem] p-5 focus:ring-4 focus:ring-[#5c7c64]/5 outline-none transition-all shadow-sm resize-none" 
                                         />

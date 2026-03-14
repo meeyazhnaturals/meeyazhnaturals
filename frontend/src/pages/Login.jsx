@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn, ChevronRight, Apple, Github, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, LogIn, ChevronRight, Apple, Github, ArrowLeft, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export const Login = () => {
@@ -9,17 +9,32 @@ export const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        // Admin fast-track bypass
+        if (formData.email === 'meeyazhnaturals@gmail.com' && formData.password === 'Admin@meeyazh') {
+            localStorage.setItem('isAdmin', 'true');
+            navigate('/admin');
+            setLoading(false);
+            return;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({
             email: formData.email,
             password: formData.password,
         });
-        if (error) setError(error.message);
-        else navigate('/home');
+
+        if (error) {
+            setError(error.message);
+        } else {
+            localStorage.removeItem('isAdmin'); // Ensure normal users don't have admin flag
+            navigate('/home');
+        }
         setLoading(false);
     };
 
@@ -63,18 +78,25 @@ export const Login = () => {
                         <div className="relative group">
                             <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#5c7c64] transition-colors w-5 h-5" />
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 required
-                                className="w-full bg-[#f8f5f0]/50 border-none rounded-2xl py-5 pl-16 pr-6 focus:ring-4 focus:ring-[#5c7c64]/10 transition-all outline-none text-sm placeholder:text-gray-400"
+                                className="w-full bg-[#f8f5f0]/50 border-none rounded-2xl py-5 pl-16 pr-14 focus:ring-4 focus:ring-[#5c7c64]/10 transition-all outline-none text-sm placeholder:text-gray-400"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#5c7c64] transition-colors"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
                         </div>
                     </div>
 
                     <div className="flex justify-end p-1">
-                        <a href="#" className="text-xs font-bold text-gray-400 hover:text-[#2d3e34] hover:underline underline-offset-4 tracking-widest uppercase">Forgot Password?</a>
+                        <Link to="/forgot-password" title="Recover account" className="text-xs font-bold text-gray-400 hover:text-[#2d3e34] hover:underline underline-offset-4 tracking-widest uppercase">Forgot Password?</Link>
                     </div>
 
                     <button

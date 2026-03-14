@@ -3,10 +3,14 @@ import { Routes, Route } from 'react-router-dom'
 import { LandingPage } from './pages/LandingPage'
 import { Login } from './pages/Login'
 import { Signup } from './pages/Signup'
+import { ForgotPassword } from './pages/ForgotPassword'
+import { UpdatePassword } from './pages/UpdatePassword'
+import { VerifyEmail } from './pages/VerifyEmail'
 import { Home } from './pages/Home'
 import { ProductDetails } from './pages/ProductDetails'
 import { Checkout } from './pages/Checkout'
 import { Navbar } from './components/Navbar'
+import { ScrollToTop } from './components/ScrollToTop'
 import { Footer } from './components/Footer'
 import { CartProvider } from './context/CartContext'
 import { About } from './pages/About'
@@ -18,23 +22,31 @@ import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
 import { Contact } from './pages/Contact'
 import { Shipping } from './pages/Shipping'
+import { AdminPanel } from './pages/AdminPanel'
+import { MyOrders } from './pages/MyOrders'
 
 function App() {
     return (
         <CartProvider>
             <div className="min-h-screen flex flex-col">
+                <ScrollToTop />
                 <Navbar />
                 <main className="flex-grow pt-24">
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/update-password" element={<UpdatePassword />} />
+                        <Route path="/verify-email" element={<VerifyEmail />} />
                         <Route path="/home" element={<Home />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/shipping" element={<Shipping />} />
+                        <Route path="/admin" element={<AdminPanel />} />
                         <Route path="/contact" element={<Contact />} />
+                        <Route path="/my-orders" element={<MyOrders />} />
                         <Route path="/product/:id" element={<ProductDetails />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/about" element={<About />} />
