@@ -88,7 +88,59 @@ export const Checkout = () => {
         }
     };
 
-    const [paymentMethod, setPaymentMethod] = useState('upi');
+    const displayRazorpay = async () => {
+        try {
+            // We create the order in backend
+            const res = await fetch('http://localhost:8080/api/payment/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: finalTotal })
+            });
+            const data = await res.json();
+            
+            // Load Razorpay script
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onerror = () => {
+                alert('Razorpay SDK failed to load. Are you online?');
+            };
+            script.onload = () => {
+                const options = {
+                    key: data.key,
+                    amount: data.amount,
+                    currency: data.currency,
+                    name: "Meeyazh Naturals",
+                    description: "Order Payment",
+                    order_id: data.id,
+                    method: 'upi',
+                    handler: function (response) {
+                        handleFinalize();
+                    },
+                    prefill: {
+                        name: `${formData.fname} ${formData.lname}`,
+                        email: formData.email || "test@example.com",
+                        contact: formData.phone ? `+91${formData.phone.replace(/[^0-9]/g, '').slice(-10)}` : "+919999999999",
+                        method: 'upi'
+                    },
+                    theme: {
+                        color: "#2d3e34"
+                    },
+                    modal: {
+                        confirm_close: true
+                    }
+                };
+
+
+
+                const paymentObject = new window.Razorpay(options);
+                paymentObject.open();
+            };
+            document.body.appendChild(script);
+        } catch (error) {
+            console.error("Payment initiation failed", error);
+            alert("Failed to initiate payment. Please try again.");
+        }
+    };
 
     if (cart.length === 0 && step < 4) {
         return (
@@ -317,28 +369,21 @@ export const Checkout = () => {
                                     className="space-y-12"
                                 >
                                     <div>
-                                        <h2 className="font-serif text-3xl font-bold text-[#2d3e34] mb-8">Payment Method</h2>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {[
-                                                { id: 'upi', label: 'UPI (Paytm/GPay)', icon: <Zap className="w-5 h-5" /> },
-                                                { id: 'card', label: 'Card Payment', icon: <CardIcon className="w-5 h-5" /> }
-                                            ].map(method => (
-                                                <button
-                                                    key={method.id}
-                                                    onClick={() => setPaymentMethod(method.id)}
-                                                    className={`p-6 rounded-2xl flex items-center gap-4 border-2 transition-all ${paymentMethod === method.id ? 'bg-white border-[#2d3e34] shadow-xl translate-y-[-2px]' : 'bg-transparent border-gray-100 grayscale opacity-60 hover:grayscale-0 hover:opacity-100'}`}
-                                                >
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === method.id ? 'bg-[#2d3e34] text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                                        {method.icon}
-                                                    </div>
-                                                    <span className="font-bold text-sm tracking-tight">{method.label}</span>
-                                                </button>
-                                            ))}
+                                        <h2 className="font-serif text-3xl font-bold text-[#2d3e34] mb-8">Secure Payment</h2>
+                                        <div className="bg-white border-2 border-[#2d3e34] rounded-[2rem] p-8 flex items-center justify-between shadow-lg">
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-12 h-12 bg-[#f8f5f0] rounded-full flex items-center justify-center text-[#2d3e34]"><Lock className="w-6 h-6" /></div>
+                                                <div>
+                                                    <h4 className="font-bold text-[#2d3e34]">Razorpay Secure</h4>
+                                                    <p className="text-sm text-[#2d3e34]/50">Pay via UPI, Cards, Wallets, or NetBanking</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex bg-[#2d3e34] text-white px-4 py-2 rounded-xl text-xs font-bold tracking-widest uppercase">Razorpay</div>
                                         </div>
                                     </div>
                                     <div className="flex gap-4">
                                         <button onClick={() => setStep(2)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
-                                        <button onClick={handleFinalize} className="w-2/3 btn-premium bg-[#5c7c64] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(92,124,100,0.3)]">Complete Purchase <Lock className="w-5 h-5" /></button>
+                                        <button onClick={displayRazorpay} className="w-2/3 btn-premium bg-[#5c7c64] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(92,124,100,0.3)] transform active:scale-95 transition-all text-xl">Pay with Razorpay <Lock className="w-5 h-5" /></button>
                                     </div>
                                 </motion.div>
                             )}

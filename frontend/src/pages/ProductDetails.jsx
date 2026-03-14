@@ -18,6 +18,31 @@ export const ProductDetails = () => {
     const [activeTab, setActiveTab] = useState('benefits');
     const [selectedVariant, setSelectedVariant] = useState('500g');
     const [added, setAdded] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = async () => {
+        const shareData = {
+            title: product?.name || 'Meeyazh Naturals Product',
+            text: product?.description || 'Check out this product from Meeyazh Naturals',
+            url: window.location.href
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.error("Error sharing:", err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (err) {
+                console.error("Failed to copy:", err);
+            }
+        }
+    };
 
     useEffect(() => {
         fetchProduct();
@@ -74,7 +99,7 @@ export const ProductDetails = () => {
     );
 
     return (
-        <div className="bg-[#f8f5f0] min-h-screen pb-24 font-sans pt-32">
+        <div className="bg-[#f8f5f0] min-h-screen pb-24 font-sans pt-8 md:pt-16">
             <div className="container mx-auto px-6">
                 {/* Breadcrumbs */}
                 <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#2d3e34]/60 hover:text-[#2d3e34] font-bold text-xs uppercase tracking-widest mb-12 transition-colors group">
@@ -91,8 +116,9 @@ export const ProductDetails = () => {
                         <div className="aspect-square rounded-[3rem] overflow-hidden bg-white shadow-2xl border-8 border-white group relative">
                             <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             <div className="absolute top-6 right-6 flex flex-col gap-3">
-                                <button className="w-12 h-12 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white text-[#2d3e34] transition-all transform active:scale-95"><Heart className="w-5 h-5" /></button>
-                                <button className="w-12 h-12 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white text-[#2d3e34] transition-all transform active:scale-95"><Share2 className="w-5 h-5" /></button>
+                                <button onClick={handleShare} className="w-12 h-12 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg hover:bg-white text-[#2d3e34] transition-all transform active:scale-95">
+                                    {copied ? <CheckCircle2 className="w-5 h-5 text-green-600" /> : <Share2 className="w-5 h-5" />}
+                                </button>
                             </div>
                         </div>
                         <div className="grid grid-cols-4 gap-4">
@@ -228,30 +254,10 @@ export const ProductDetails = () => {
                     </div>
                 </div>
 
-                {/* Related Products Placeholder */}
-                <div className="mt-32">
-                    <h2 className="font-serif text-3xl font-bold text-[#2d3e34] mb-12">Complete Your Routine</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Placeholder Related Products */}
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-50 flex gap-6 items-center">
-                                <div className="w-20 h-20 rounded-2xl bg-gray-50 overflow-hidden shrink-0"><img src={product.image} className="w-full h-full object-cover" /></div>
-                                <div className="flex-grow">
-                                    <h4 className="font-bold text-sm">Similar Product {i}</h4>
-                                    <p className="text-lg font-bold">₹{product.price - 50}</p>
-                                    <button className="text-[10px] font-bold text-[#5c7c64] uppercase tracking-widest mt-1 hover:underline">View Product <ChevronRight className="w-3 h-3 inline" /></button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+
             </div>
 
-            {/* Direct Support Button */}
-            <a href="https://wa.me/yournumber" className="fixed bottom-8 left-8 bg-white/90 backdrop-blur-md border border-gray-200 px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 group hover:bg-[#25D366] hover:text-white transition-all z-40 transform hover:scale-105 active:scale-95">
-                <MessageSquare className="w-5 h-5 text-[#25D366] group-hover:text-white transition-colors" />
-                <span className="font-bold text-sm">Expert Consultation</span>
-            </a>
+
         </div>
     );
 };

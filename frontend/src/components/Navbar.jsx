@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, Menu, X, ChevronRight, ArrowUpRight, LogOut, UserPlus, LogIn, Minus, Plus, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 export const Navbar = () => {
     const { cart, cartCount, cartTotal, removeFromCart, updateQuantity } = useCart();
     const location = useLocation();
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -37,6 +38,7 @@ export const Navbar = () => {
     const handleSignOut = async () => {
         await supabase.auth.signOut();
         setIsMenuOpen(false);
+        navigate('/');
     };
 
     const toggleCart = () => {
@@ -255,13 +257,15 @@ export const Navbar = () => {
                                     {!user && (
                                         <div className="pt-8 border-t border-gray-50 w-full shrink-0">
                                             <p className="text-sm text-gray-400 font-medium mb-1">Have an account?</p>
-                                            <Link
-                                                to="/login"
-                                                onClick={() => setIsCartOpen(false)}
-                                                className="text-[#2d3e34] font-bold text-sm hover:underline underline-offset-4"
-                                            >
-                                                "Login" to check out faster
-                                            </Link>
+                                            <span className="text-sm text-gray-500">
+                                                <Link
+                                                    to="/login"
+                                                    onClick={() => setIsCartOpen(false)}
+                                                    className="text-blue-600 font-bold hover:underline underline-offset-4"
+                                                >
+                                                    Login
+                                                </Link> to check out faster
+                                            </span>
                                         </div>
                                     )}
                                 </div>

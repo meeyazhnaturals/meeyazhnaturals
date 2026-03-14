@@ -125,30 +125,28 @@ export const LandingPage = () => {
                         </button>
                     </div>
                 </div>
-            </section>
 
-
-
-
-            {/* Clean Community/Newsletter Section */}
-            <section className="container mx-auto px-6 pb-40 max-w-5xl text-center">
-                <div className="bg-[#2d3e34] rounded-[3rem] p-12 md:p-24 shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32 transition-transform group-hover:scale-110 duration-1000" />
-                    <h2 className="font-serif text-4xl md:text-6xl font-bold mb-6 text-white leading-tight">Join our Pure <br /> Community</h2>
-                    <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto">Get regular doses of recipes, tradition, and exclusive discounts directly in your inbox.</p>
-                    <div className="flex flex-col md:flex-row gap-4 max-w-md mx-auto">
-                        <input
-                            type="email"
-                            placeholder="Email Address"
-                            className="flex-grow px-8 py-6 rounded-2xl bg-white/10 text-white placeholder:text-gray-500 border border-white/20 focus:ring-4 focus:ring-white/10 outline-none transition-all"
-                        />
-                        <button className="bg-white text-black px-12 py-6 rounded-2xl font-bold hover:bg-[#5c7c64] hover:text-white transition-all shadow-xl active:scale-95 transform">Subscribe</button>
+                {/* Soap Bars Theme */}
+                <div className="flex flex-col md:flex-row-reverse items-center gap-12">
+                    <div className="w-full md:w-1/2">
+                        <img src="/images/Soap Bars.PNG" alt="Handcrafted Soap Bars" className="w-full h-auto rounded-xl md:rounded-3xl shadow-2xl object-cover" />
                     </div>
-                    <div className="mt-12 flex items-center justify-center gap-3 text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                        <div className="w-4 h-px bg-white/20" /> No spam. Just pure nature. <div className="w-4 h-px bg-white/20" />
+                    <div className="w-full md:w-1/2 space-y-6">
+                        <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#2d3e34]">Nature's Gentle Cleanse</h2>
+                        <p className="text-gray-600 text-lg leading-relaxed">
+                            Elevate your daily routine with our handcrafted soap bars. Gently formulated with pure botanical extracts, they cleanse and nourish your skin, keeping it naturally glowing and deeply moisturized.
+                        </p>
+                        <button onClick={() => navigate('/login')} className="inline-block bg-[#5c7c64] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#2d3e34] transition-colors shadow-lg">
+                            View Products
+                        </button>
                     </div>
                 </div>
             </section>
+
+
+
+
+
         </div>
     );
 };
