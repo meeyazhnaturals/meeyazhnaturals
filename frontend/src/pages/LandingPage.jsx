@@ -73,9 +73,9 @@ export const LandingPage = () => {
     const prevSlide = () => setActiveSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
 
     return (
-        <div className="bg-[#fcfaf7] min-h-screen overflow-x-hidden pt-20 md:pt-24 font-sans focus-visible:outline-none">
+        <div className="bg-[#fcfaf7] min-h-screen overflow-x-hidden font-sans focus-visible:outline-none">
             {/* The "First Look" Hero - Clean Image Slider like the reference */}
-            <section className="px-4 md:px-8 mb-10 relative">
+            <section className="px-4 md:px-8 mb-10 relative pt-16 md:pt-20">
                 <div className="max-w-7xl mx-auto group">
                     <div className="relative aspect-[4/5] md:aspect-[21/9] bg-white md:bg-transparent rounded-sm md:rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] group flex items-center justify-center">
                         <AnimatePresence mode="wait">

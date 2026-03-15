@@ -55,7 +55,7 @@ export const Home = () => {
     );
 
     return (
-        <div className="bg-[#f8f5f0] min-h-screen pb-24 pt-8">
+        <div className="bg-[#f8f5f0] min-h-screen pb-24 pt-16 md:pt-20">
             {/* Shop Content area */}
             <div className="container mx-auto px-6 max-w-7xl">
                 <div className="flex flex-col lg:flex-row gap-16">
