@@ -98,6 +98,10 @@ export const Checkout = () => {
             });
             const data = await res.json();
             
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to create payment order');
+            }
+            
             // Load Razorpay script
             const script = document.createElement('script');
             script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -105,35 +109,38 @@ export const Checkout = () => {
                 alert('Razorpay SDK failed to load. Are you online?');
             };
             script.onload = () => {
-                const options = {
-                    key: data.key,
-                    amount: data.amount,
-                    currency: data.currency,
-                    name: "Meeyazh Naturals",
-                    description: "Order Payment",
-                    order_id: data.id,
-                    method: 'upi',
-                    handler: function (response) {
-                        handleFinalize();
-                    },
-                    prefill: {
-                        name: `${formData.fname} ${formData.lname}`,
-                        email: formData.email || "test@example.com",
-                        contact: formData.phone ? `+91${formData.phone.replace(/[^0-9]/g, '').slice(-10)}` : "+919999999999",
-                        method: 'upi'
-                    },
-                    theme: {
-                        color: "#2d3e34"
-                    },
-                    modal: {
-                        confirm_close: true
-                    }
-                };
+                try {
+                    const options = {
+                        key: data.key,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: "Meeyazh Naturals",
+                        description: "Order Payment",
+                        order_id: data.id,
+                        method: 'upi',
+                        handler: function (response) {
+                            handleFinalize();
+                        },
+                        prefill: {
+                            name: `${formData.fname || ''} ${formData.lname || ''}`.trim(),
+                            email: formData.email || "test@example.com",
+                            contact: formData.phone ? `+91${String(formData.phone).replace(/[^0-9]/g, '').slice(-10)}` : "+919999999999",
+                            method: 'upi'
+                        },
+                        theme: {
+                            color: "#2d3e34"
+                        },
+                        modal: {
+                            confirm_close: true
+                        }
+                    };
 
-
-
-                const paymentObject = new window.Razorpay(options);
-                paymentObject.open();
+                    const paymentObject = new window.Razorpay(options);
+                    paymentObject.open();
+                } catch (err) {
+                    console.error("Error setting up Razorpay options:", err);
+                    alert("Payment configuration failed. Please try again.");
+                }
             };
             document.body.appendChild(script);
         } catch (error) {
