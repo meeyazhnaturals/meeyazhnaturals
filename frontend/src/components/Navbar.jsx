@@ -142,7 +142,7 @@ export const Navbar = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: '-100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-                            className="fixed top-0 left-0 w-full max-w-[280px] md:max-w-xs bg-white z-[120] flex flex-col h-screen shadow-2xl"
+                            className="fixed top-0 left-0 w-full max-w-[280px] md:max-w-xs bg-white z-[120] flex flex-col h-[100dvh] shadow-2xl"
                         >
                             <div className="flex items-center justify-between p-6 border-b border-gray-50 bg-[#f8f5f0]/30 h-16 md:h-20">
                                 <h2 className="font-serif text-lg md:text-xl font-bold text-[#2d3e34]">Navigation</h2>
@@ -178,7 +178,7 @@ export const Navbar = () => {
                                 ))}
                             </div>
 
-                            <div className="p-6 mt-auto border-t border-gray-50 bg-gray-50/50">
+                            <div className="p-6 pb-12 md:pb-6 mt-auto border-t border-gray-50 bg-gray-50/50">
                                 {user ? (
                                     <button
                                         onClick={handleSignOut}
@@ -231,7 +231,7 @@ export const Navbar = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: '100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-                            className="fixed top-0 right-0 w-full max-w-[400px] bg-white z-[120] flex flex-col h-screen shadow-2xl"
+                            className="fixed top-0 right-0 w-full max-w-[400px] bg-white z-[120] flex flex-col h-[100dvh] shadow-2xl"
                         >
                             <div className="flex items-center justify-between p-6 border-b border-gray-50 bg-[#f8f5f0]/30 h-16 md:h-20">
                                 <h2 className="font-serif text-lg md:text-xl font-bold text-[#2d3e34]">Your Cart</h2>
@@ -326,7 +326,7 @@ export const Navbar = () => {
                                     </div>
 
                                     {/* Cart Footer */}
-                                    <div className="border-t border-gray-100 p-6 space-y-4 bg-white shrink-0">
+                                    <div className="border-t border-gray-100 p-6 pb-12 md:pb-6 space-y-4 bg-white shrink-0">
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm text-gray-400 font-medium">Subtotal</span>
                                             <span className="text-xl font-bold text-[#2d3e34]">₹{cartTotal}</span>
