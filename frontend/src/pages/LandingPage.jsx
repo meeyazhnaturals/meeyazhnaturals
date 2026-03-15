@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProductCard } from '../components/ProductCard';
+
+const CATEGORIES = ["All", "Health Mix", "Tooth Powder", "Bath Powder", "Soap Bar"];
 
 export const LandingPage = () => {
     const [activeSlide, setActiveSlide] = useState(0);
     const navigate = useNavigate();
+
+    const [products, setProducts] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState("Newest");
 
     const heroImages = [
         '/images/ABC Mix.PNG',
@@ -19,8 +28,46 @@ export const LandingPage = () => {
         '/images/Rose Rush Mix.PNG'
     ];
 
+    useEffect(() => {
+        fetchProducts();
+    }, [selectedCategory, sortBy]);
 
+    const fetchProducts = async () => {
+        setLoading(true);
 
+        const localProducts = [
+            { id: 1, name: 'ABC Mix', price: 595, oldPrice: 799, weight: '200g', rating: 4.8, description: 'Natural iron booster with apple, beetroot, and carrot.', image: '/images/ABC Mix.PNG', category: 'Health Mix' },
+            { id: 2, name: 'Basil Bliss Mix', price: 212, oldPrice: 499, weight: '200g', rating: 4.9, description: 'Soothing blend with holy basil and sprouted millets.', image: '/images/Basil Bliss Mix.PNG', category: 'Health Mix' },
+            { id: 3, name: 'Curry Leaf Mix', price: 170, oldPrice: 399, weight: '200g', rating: 4.8, description: 'Superfood powder for hair and digestive health.', image: '/images/Curry Leaf Mix.PNG', category: 'Health Mix' },
+            { id: 4, name: 'Hibiscus Mix', price: 297, oldPrice: 499, weight: '200g', rating: 4.6, description: 'Refreshing detox blend with hibiscus and spices.', image: '/images/Hibiscus Mix.PNG', category: 'Health Mix' },
+            { id: 5, name: 'MR Miracle Mix', price: 255, oldPrice: 499, weight: '200g', rating: 4.7, description: 'Traditional multi-grain health mix for the family.', image: '/images/MR Miracle Mix.PNG', category: 'Health Mix' },
+            { id: 6, name: 'Neemmune Mix', price: 399, oldPrice: 799, weight: '200g', rating: 4.7, description: 'Immunity boosting neem blend.', image: '/images/Neemmune Mix.PNG', category: 'Health Mix' },
+            { id: 7, name: 'Power House Mix', price: 297, oldPrice: 499, weight: '200g', rating: 5.0, description: 'Ultimate energy blend for active lifestyles.', image: '/images/Power House Mix.PNG', category: 'Health Mix' },
+            { id: 8, name: 'Rose Rush Mix', price: 340, oldPrice: 599, weight: '200g', rating: 4.8, description: 'Calming and aromatic rose mix.', image: '/images/Rose Rush Mix.PNG', category: 'Health Mix' },
+            { id: 9, name: 'Charcoal Tooth Powder', price: 150, oldPrice: 299, weight: '50g', rating: 4.7, description: 'Activated charcoal tooth powder for deep cleansing and whitening.', image: '/images/Charcoal Tooth Powder.PNG', category: 'Tooth Powder' },
+            { id: 10, name: 'Herbal Tooth Powder', price: 130, oldPrice: 249, weight: '50g', rating: 4.8, description: 'Traditional herbal tooth powder for strong gums and fresh breath.', image: '/images/Herbal Tooth Powder.PNG', category: 'Tooth Powder' },
+            { id: 11, name: 'Flowrain Bath Powder', price: 199, oldPrice: 399, weight: '100g', rating: 4.9, description: 'Natural bath powder with aromatic florals for soft and glowing skin.', image: '/images/Flowrain Bath Powder.PNG', category: 'Bath Powder' },
+            { id: 12, name: 'Lavender Bath Salt', price: 249, oldPrice: 499, weight: '150g', rating: 5.0, description: 'Calming lavender bath salt to relax your muscles and soothe your senses.', image: '/images/Lavender Bath Salt.PNG', category: 'Bath Powder' },
+            { id: 13, name: 'Potato Soap Bar', price: 145, oldPrice: 249, weight: '100g', rating: 4.8, description: 'Natural brightening soap bar made with fresh potato extracts to reduce dark spots.', image: '/images/Potato Soap Bar.PNG', category: 'Soap Bar' },
+            { id: 14, name: 'Tomato Soap Bar', price: 145, oldPrice: 249, weight: '100g', rating: 4.7, description: 'Refresh your skin with tomato extracts for a natural glow and tanning removal.', image: '/images/Tomato Soap Bar.PNG', category: 'Soap Bar' },
+            { id: 15, name: 'Kuppainmeni Soap Bar', price: 165, oldPrice: 299, weight: '100g', rating: 4.9, description: 'Traditional herbal soap bar with Kuppainmeni extracts for treating skin infections and allergies.', image: '/images/Kuppaimeni Soap Bar.PNG', category: 'Soap Bar' },
+        ];
+
+        let filtered = localProducts;
+        if (selectedCategory !== "All") {
+            filtered = filtered.filter(p => p.category === selectedCategory);
+        }
+
+        if (sortBy === "Price: Low to High") filtered.sort((a, b) => a.price - b.price);
+        else if (sortBy === "Price: High to Low") filtered.sort((a, b) => b.price - a.price);
+
+        setProducts(filtered);
+        setLoading(false);
+    };
+
+    const filteredProducts = products.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const nextSlide = () => setActiveSlide((prev) => (prev + 1) % heroImages.length);
     const prevSlide = () => setActiveSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
@@ -28,7 +75,7 @@ export const LandingPage = () => {
     return (
         <div className="bg-[#fcfaf7] min-h-screen overflow-x-hidden pt-20 md:pt-24 font-sans focus-visible:outline-none">
             {/* The "First Look" Hero - Clean Image Slider like the reference */}
-            <section className="px-4 md:px-8 mb-20 relative">
+            <section className="px-4 md:px-8 mb-10 relative">
                 <div className="max-w-7xl mx-auto group">
                     <div className="relative aspect-[4/5] md:aspect-[21/9] bg-white md:bg-transparent rounded-sm md:rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] group flex items-center justify-center">
                         <AnimatePresence mode="wait">
@@ -44,7 +91,7 @@ export const LandingPage = () => {
                             />
                         </AnimatePresence>
 
-                        {/* Elegant Arrows (Matching the reference circle style) */}
+                        {/* Elegant Arrows */}
                         <div className="absolute inset-y-0 left-4 md:left-10 flex items-center">
                             <button
                                 onClick={prevSlide}
@@ -76,92 +123,70 @@ export const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Sign Up / Login CTA */}
-            <section className="flex flex-col items-center justify-center">
-                <motion.button
-                    onClick={() => navigate('/login')}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-10 py-4 bg-gradient-to-r from-[#5c7c64] to-[#3d5a44] text-white text-lg font-bold rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 tracking-wide"
-                >
-                    Sign Up / Login
-                </motion.button>
-                <p className="mt-4 text-gray-500 text-sm md:text-base italic tracking-wide">
-                    Sign in to view all products &amp; prices
-                </p>
-            </section>
+            {/* Added Shop Content from Home */}
+            <div className="container mx-auto px-6 max-w-7xl pb-24">
+                <div className="flex flex-col lg:flex-row gap-16">
+                    <div className="flex-1 w-full">
+                        <div className="flex flex-col md:flex-row items-center gap-6 mb-12">
+                            <div className="relative flex-grow group w-full">
+                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#5c7c64] transition-colors w-5 h-5" />
+                                <input
+                                    type="text"
+                                    placeholder="Search by name, ingredient, or benefit..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-white border border-gray-100 rounded-[2rem] py-5 pl-16 pr-6 focus:ring-4 focus:ring-[#5c7c64]/5 transition-all outline-none shadow-sm text-sm"
+                                />
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{filteredProducts.length} items</span>
+                            </div>
+                        </div>
 
-            {/* Themed Sections */}
-            <section className="container mx-auto px-6 py-20 space-y-32">
-                {/* Family Theme */}
-                <div className="flex flex-col md:flex-row items-center gap-12">
-                    <div className="w-full md:w-1/2">
-                        <img src="/images/Family Theme.PNG" alt="Family Theme" className="w-full h-auto rounded-xl md:rounded-3xl shadow-2xl object-cover" />
-                    </div>
-                    <div className="w-full md:w-1/2 space-y-6">
-                        <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#2d3e34]">Nourish Your Family's Health</h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            Discover the secrets of traditional wellness tailored for every generation. Our carefully curated blends ensure that your loved ones receive nature's finest nutrients, promoting vitality and longevity.
-                        </p>
-                        <button onClick={() => navigate('/login')} className="inline-block bg-[#5c7c64] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#2d3e34] transition-colors shadow-lg">
-                            View Products
-                        </button>
-                    </div>
-                </div>
+                        <div className="flex overflow-x-auto gap-3 pb-8 no-scrollbar">
+                            {CATEGORIES.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={`whitespace-nowrap px-8 py-3 md:px-10 md:py-4 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-[#2d3e34] text-white shadow-xl' : 'bg-white text-[#2d3e34]/50 border border-gray-100 hover:border-[#2d3e34]/20 hover:text-[#2d3e34]'}`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
 
-                {/* College Theme */}
-                <div className="flex flex-col md:flex-row-reverse items-center gap-12">
-                    <div className="w-full md:w-1/2">
-                        <img src="/images/College Theme.PNG" alt="College Theme" className="w-full h-auto rounded-xl md:rounded-3xl shadow-2xl object-cover" />
-                    </div>
-                    <div className="w-full md:w-1/2 space-y-6">
-                        <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#2d3e34]">Fuel Your Campus Life</h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            Stay energized through long lectures and late-night study sessions. Our organic, easy-to-prepare mixes provide the perfect balance of brain-boosting nutrition and sustaining energy for active students.
-                        </p>
-                        <button onClick={() => navigate('/login')} className="inline-block bg-[#5c7c64] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#2d3e34] transition-colors shadow-lg">
-                            View Products
-                        </button>
-                    </div>
-                </div>
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center py-32">
+                                <Loader2 className="w-12 h-12 text-[#5c7c64] animate-spin mb-4" />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
+                                <AnimatePresence mode="popLayout">
+                                    {filteredProducts.map((product) => (
+                                        <motion.div
+                                            key={product.id}
+                                            layout
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                        >
+                                            <ProductCard product={product} isLanding={true} />
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </div>
+                        )}
 
-                {/* Multi Theme */}
-                <div className="flex flex-col md:flex-row items-center gap-12">
-                    <div className="w-full md:w-1/2">
-                        <img src="/images/Multi Theme.PNG" alt="Multi Theme" className="w-full h-auto rounded-xl md:rounded-3xl shadow-2xl object-cover" />
-                    </div>
-                    <div className="w-full md:w-1/2 space-y-6">
-                        <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#2d3e34]">Holistic Nutrition for All</h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            A versatile approach to modern diet dilemmas. Blending ancient grains and powerful superfoods, our signature multi-theme collection adapts to your dynamic lifestyle, delivering uncompromising purity.
-                        </p>
-                        <button onClick={() => navigate('/login')} className="inline-block bg-[#5c7c64] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#2d3e34] transition-colors shadow-lg">
-                            View Products
-                        </button>
+                        {!loading && filteredProducts.length === 0 && (
+                            <div className="text-center py-32 bg-white rounded-[4rem] border-2 border-dashed border-gray-100">
+                                <p className="font-serif text-2xl text-gray-400">We couldn't find what you're looking for.</p>
+                                <button onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }} className="mt-6 text-[#5c7c64] font-bold uppercase tracking-widest text-xs hover:underline underline-offset-8">View all products</button>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* Soap Bars Theme */}
-                <div className="flex flex-col md:flex-row-reverse items-center gap-12">
-                    <div className="w-full md:w-1/2">
-                        <img src="/images/Soap Bars.PNG" alt="Handcrafted Soap Bars" className="w-full h-auto rounded-xl md:rounded-3xl shadow-2xl object-cover" />
-                    </div>
-                    <div className="w-full md:w-1/2 space-y-6">
-                        <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#2d3e34]">Nature's Gentle Cleanse</h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            Elevate your daily routine with our handcrafted soap bars. Gently formulated with pure botanical extracts, they cleanse and nourish your skin, keeping it naturally glowing and deeply moisturized.
-                        </p>
-                        <button onClick={() => navigate('/login')} className="inline-block bg-[#5c7c64] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#2d3e34] transition-colors shadow-lg">
-                            View Products
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-
-
-
-
+            </div>
+            {/* End Added Shop Content from Home */}
         </div>
     );
 };

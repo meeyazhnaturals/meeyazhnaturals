@@ -2,15 +2,22 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Star, Check, ArrowRight, Plus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export const ProductCard = ({ product }) => {
+export const ProductCard = ({ product, isLanding = false }) => {
     const { addToCart } = useCart();
     const [added, setAdded] = React.useState(false);
+    const navigate = useNavigate();
 
     const handleAddToCart = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        if (isLanding) {
+            navigate('/login');
+            return;
+        }
+
         addToCart(product);
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
@@ -21,7 +28,7 @@ export const ProductCard = ({ product }) => {
             whileHover={{ y: -5 }}
             className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 group flex flex-col h-full"
         >
-            <Link to={`/product/${product.id}`} className="block relative aspect-square md:aspect-[4/5] overflow-hidden">
+            <Link to={isLanding ? "/login" : `/product/${product.id}`} className="block relative aspect-square md:aspect-[4/5] overflow-hidden">
                 <img
                     src={product.image || '/images/MR Miracle.JPG'}
                     alt={product.name}
@@ -38,7 +45,7 @@ export const ProductCard = ({ product }) => {
 
             <div className="p-3 md:p-6 lg:p-8 flex-grow flex flex-col">
                 <div className="flex justify-between items-start mb-1 md:mb-2">
-                    <Link to={`/product/${product.id}`} className="hover:text-[#5c7c64] transition-colors flex-grow min-w-0">
+                    <Link to={isLanding ? "/login" : `/product/${product.id}`} className="hover:text-[#5c7c64] transition-colors flex-grow min-w-0">
                         <h3 className="font-serif text-sm md:text-xl font-bold text-[#2d3e34] line-clamp-1">{product.name}</h3>
                     </Link>
                     <div className="flex items-center gap-0.5 md:gap-1 text-yellow-500 shrink-0 ml-2">
