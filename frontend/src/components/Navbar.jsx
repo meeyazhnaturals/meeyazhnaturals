@@ -180,16 +180,25 @@ export const Navbar = () => {
 
                             <div className="p-6 pb-12 md:pb-6 mt-auto border-t border-gray-50 bg-gray-50/50">
                                 {user ? (
-                                    <button
-                                        onClick={handleSignOut}
-                                        className="flex items-center justify-between w-full p-5 bg-white rounded-[1.5rem] shadow-sm group hover:bg-red-50 transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
-                                            <span className="font-bold text-sm">Sign Out</span>
-                                        </div>
-                                        <ArrowUpRight className="w-4 h-4 text-gray-300" />
-                                    </button>
+                                    <div className="space-y-3">
+                                        <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between p-5 bg-white rounded-[1.5rem] shadow-sm group">
+                                            <div className="flex items-center gap-3">
+                                                <User className="w-5 h-5 text-gray-400 group-hover:text-[#5c7c64] transition-colors" />
+                                                <span className="font-bold text-sm">My Profile</span>
+                                            </div>
+                                            <ArrowUpRight className="w-4 h-4 text-gray-300" />
+                                        </Link>
+                                        <button
+                                            onClick={handleSignOut}
+                                            className="flex items-center justify-between w-full p-5 bg-white rounded-[1.5rem] shadow-sm group hover:bg-red-50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
+                                                <span className="font-bold text-sm">Sign Out</span>
+                                            </div>
+                                            <ArrowUpRight className="w-4 h-4 text-gray-300" />
+                                        </button>
+                                    </div>
                                 ) : (
                                     <div className="space-y-3">
                                         <Link to="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between p-5 bg-white rounded-[1.5rem] shadow-sm group">
