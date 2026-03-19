@@ -91,10 +91,20 @@ export const Checkout = () => {
     const displayRazorpay = async () => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const orderDetails = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+            const addressString = `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
+            
             const res = await fetch(`${apiUrl}/api/payment/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: finalTotal })
+                body: JSON.stringify({ 
+                    amount: finalTotal,
+                    name: `${formData.fname} ${formData.lname}`,
+                    email: formData.email,
+                    phone: formData.phone,
+                    address: addressString,
+                    details: orderDetails
+                })
             });
             const data = await res.json();
             
@@ -119,7 +129,7 @@ export const Checkout = () => {
                         order_id: data.id,
                         method: 'upi',
                         handler: function (response) {
-                            handleFinalize();
+                            handleFinalize(response.razorpay_payment_id, data.id);
                         },
                         prefill: {
                             name: `${formData.fname || ''} ${formData.lname || ''}`.trim(),
@@ -182,7 +192,7 @@ export const Checkout = () => {
         window.scrollTo(0, 0);
     };
 
-    const handleFinalize = async () => {
+    const handleFinalize = async (paymentId, razorpayOrderId) => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             
@@ -191,8 +201,13 @@ export const Checkout = () => {
                     user_id: session.user.id,
                     items: cart,
                     total_amount: finalTotal,
-                    shipping_address: formData,
-                    status: 'Delivering',
+                    shipping_address: {
+                        ...formData,
+                        name: `${formData.fname} ${formData.lname}`
+                    },
+                    status: 'Processing',
+                    payment_id: paymentId,
+                    razorpay_order_id: razorpayOrderId,
                     created_at: new Date()
                 };
 
@@ -202,7 +217,6 @@ export const Checkout = () => {
 
                 if (error) {
                     console.error("Error saving order:", error.message);
-                    // We still show the success screen to the user but log the error
                 }
             }
             

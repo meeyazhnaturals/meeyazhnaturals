@@ -216,6 +216,10 @@ export const AdminPanel = () => {
                                             <Phone className="w-4 h-4 shrink-0" />
                                             <p>{selectedOrder.shipping_address?.phone}</p>
                                         </div>
+                                        <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                                            <Mail className="w-4 h-4 shrink-0" />
+                                            <p>{selectedOrder.shipping_address?.email}</p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div>
@@ -229,6 +233,12 @@ export const AdminPanel = () => {
                                             <span className="text-xs text-gray-500 font-bold uppercase">Payment ID</span>
                                             <span className="text-[10px] font-bold font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">{selectedOrder.payment_id || 'N/A'}</span>
                                         </div>
+                                        {selectedOrder.razorpay_order_id && (
+                                            <div className="flex justify-between items-center border-t border-gray-200/50 pt-3">
+                                                <span className="text-xs text-gray-500 font-bold uppercase">Razorpay Order</span>
+                                                <span className="text-[10px] font-bold font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">{selectedOrder.razorpay_order_id}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

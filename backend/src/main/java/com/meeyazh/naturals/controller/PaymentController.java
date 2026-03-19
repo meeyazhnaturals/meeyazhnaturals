@@ -21,7 +21,17 @@ public class PaymentController {
     @PostMapping("/create-order")
     public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> data) {
         try {
-            int amount = (int) data.get("amount");
+            // Safely get amount from Number to avoid ClassCastException (Double to int)
+            Number amountNum = (Number) data.getOrDefault("amount", 0);
+            int amount = amountNum.intValue();
+            
+            String customerName = (String) data.getOrDefault("name", "N/A");
+            String customerEmail = (String) data.getOrDefault("email", "N/A");
+            String customerPhone = (String) data.getOrDefault("phone", "N/A");
+            String address = (String) data.getOrDefault("address", "N/A");
+            String orderDetails = (String) data.getOrDefault("details", "N/A");
+            
+            System.out.println("Creating Razorpay Order for: " + customerName + " Amount: " + amount);
             
             RazorpayClient razorpay = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
             JSONObject orderRequest = new JSONObject();
@@ -29,6 +39,15 @@ public class PaymentController {
             orderRequest.put("currency", "INR");
             orderRequest.put("receipt", "txn_" + UUID.randomUUID().toString().substring(0, 8));
             orderRequest.put("payment_capture", true);
+            
+            // Adding technical notes for the owner to see in Razorpay Dashboard
+            JSONObject notes = new JSONObject();
+            notes.put("customer_name", customerName);
+            notes.put("customer_email", customerEmail);
+            notes.put("customer_phone", customerPhone);
+            notes.put("shipping_address", address);
+            notes.put("order_items", orderDetails);
+            orderRequest.put("notes", notes);
             
             Order order = razorpay.orders.create(orderRequest);
             
