@@ -73,6 +73,7 @@ public class PaymentController {
     @PostMapping("/notify-order")
     public ResponseEntity<?> notifyOrder(@RequestBody Map<String, Object> data) {
         try {
+            System.out.println("Received order notification request for: " + data.get("name"));
             String name = (String) data.getOrDefault("name", "N/A");
             String email = (String) data.getOrDefault("email", "N/A");
             String phone = (String) data.getOrDefault("phone", "N/A");
@@ -80,6 +81,8 @@ public class PaymentController {
             String items = (String) data.getOrDefault("items", "N/A");
             String total = String.valueOf(data.getOrDefault("total", "0"));
 
+            System.out.println("Attempting to send email alert to meeyazhnaturals@gmail.com...");
+            
             String subject = "New Order Received from " + name;
             String body = "Hey Meeyazhnaturals you have an order please process it quickly.\n\n" +
                          "--- Customer Details ---\n" +
@@ -96,6 +99,7 @@ public class PaymentController {
             emailService.sendOrderNotification("meeyazhnaturals@gmail.com", subject, body);
             return ResponseEntity.ok(Map.of("message", "Notification sent successfully"));
         } catch (Exception e) {
+            System.err.println("Fatal error in notify-order endpoint: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to send notification: " + e.getMessage()));
         }
