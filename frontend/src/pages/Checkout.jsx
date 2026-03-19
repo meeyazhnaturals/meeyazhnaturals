@@ -463,7 +463,7 @@ export const Checkout = () => {
 
                     {/* Order Summary Sidebar */}
                     <div className="w-full lg:w-[400px] shrink-0">
-                        <div className="bg-white rounded-[3rem] p-10 shadow-sm border border-gray-100 sticky top-32">
+                        <div className="bg-white rounded-[3rem] p-10 shadow-sm border border-gray-100 lg:sticky lg:top-32">
                             <h3 className="font-serif text-2xl font-bold text-[#2d3e34] mb-8">Order Summary</h3>
                             <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 no-scrollbar mb-8">
                                 {cart.map(item => (
@@ -495,7 +495,7 @@ export const Checkout = () => {
                         </div>
 
                         {/* Actions for Mobile */}
-                        <div className="block lg:hidden mt-12">
+                        <div className="block lg:hidden mt-8 mb-12">
                             {renderActions()}
                         </div>
                     </div>
