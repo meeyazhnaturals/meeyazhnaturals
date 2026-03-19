@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -34,8 +32,7 @@ public class Order {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String address;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "JSONB", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String items;
 
     @Column(name = "total_amount", nullable = false)
