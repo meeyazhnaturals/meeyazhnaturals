@@ -129,7 +129,11 @@ export const Checkout = () => {
                         order_id: data.id,
                         method: 'upi',
                         handler: function (response) {
-                            handleFinalize(response.razorpay_payment_id, data.id);
+                            handleFinalize(
+                                response.razorpay_payment_id, 
+                                response.razorpay_order_id, 
+                                response.razorpay_signature
+                            );
                         },
                         prefill: {
                             name: `${formData.fname || ''} ${formData.lname || ''}`.trim(),
@@ -223,61 +227,47 @@ export const Checkout = () => {
         }
     };
 
-    const handleFinalize = async (paymentId, razorpayOrderId) => {
+    const handleFinalize = async (paymentId, razorpayOrderId, razorpaySignature) => {
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session?.user) {
-                const orderData = {
-                    user_id: session.user.id,
-                    items: cart,
-                    total_amount: finalTotal,
-                    shipping_address: {
-                        ...formData,
-                        name: `${formData.fname} ${formData.lname}`
-                    },
-                    status: 'Processing',
-                    payment_id: paymentId,
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const itemsStr = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+            const addressStr = `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
+
+            const orderDetails = {
+                customer_name: `${formData.fname} ${formData.lname}`,
+                email: formData.email,
+                phone: formData.phone,
+                address: addressStr,
+                items: itemsStr,
+                total_amount: finalTotal
+            };
+
+            console.log("Verifying payment and creating order at:", apiUrl);
+
+            const response = await fetch(`${apiUrl}/api/payment/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     razorpay_order_id: razorpayOrderId,
-                    created_at: new Date()
-                };
+                    razorpay_payment_id: paymentId,
+                    razorpay_signature: razorpaySignature,
+                    order_details: orderDetails
+                })
+            });
 
-                const { error } = await supabase
-                    .from('orders')
-                    .insert([orderData]);
+            const result = await response.json();
 
-                if (error) {
-                    console.error("Error saving order:", error.message);
-                } else {
-                    // Send email notification to owner via backend
-                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-                    const itemsStr = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
-                    const addressStr = `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
-                    
-                    console.log("NOTIFYING OWNER AT:", apiUrl);
-                    
-                    await fetch(`${apiUrl}/api/payment/notify-order`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            name: `${formData.fname} ${formData.lname}`,
-                            email: formData.email,
-                            phone: formData.phone,
-                            address: addressStr,
-                            items: itemsStr,
-                            total: finalTotal
-                        })
-                    }).then(() => console.log("Email notification sent successfully!"))
-                      .catch(err => console.error("Email notification failed. If you see 'localhost' in the URL above, check your Vercel Environment Variables:", err));
-                }
+            if (response.ok) {
+                console.log("Order created successfully:", result.order_id);
+                setStep(4);
+                clearCart();
+            } else {
+                console.error("Payment verification failed:", result.message || result.error);
+                alert("Payment verification failed. Please contact support. Error: " + (result.message || result.error));
             }
-            
-            setStep(4);
-            clearCart();
         } catch (err) {
             console.error("Critical error during finalization:", err);
-            setStep(4);
-            clearCart();
+            alert("Something went wrong while confirming your order. Please check your email or contact support.");
         }
     };
 

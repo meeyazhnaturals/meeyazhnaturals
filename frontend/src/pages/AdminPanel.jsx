@@ -22,15 +22,14 @@ export const AdminPanel = () => {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*')
-                .order('created_at', { ascending: false });
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const res = await fetch(`${apiUrl}/api/admin/orders`);
+            const data = await res.json();
 
-            if (error) {
-                console.error("Error fetching orders:", error);
-            } else {
+            if (res.ok) {
                 setOrders(data || []);
+            } else {
+                console.error("Error fetching orders:", data);
             }
         } catch (err) {
             console.error(err);
@@ -41,17 +40,20 @@ export const AdminPanel = () => {
 
     const handleStatusUpdate = async (orderId, newStatus) => {
         try {
-            const { error } = await supabase
-                .from('orders')
-                .update({ status: newStatus })
-                .eq('id', orderId);
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const res = await fetch(`${apiUrl}/api/admin/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
 
-            if (error) {
-                alert('Failed to update status: ' + error.message);
+            if (!res.ok) {
+                const data = await res.json();
+                alert('Failed to update status: ' + (data.message || 'Unknown error'));
             } else {
                 fetchOrders(); // Refresh
                 if (selectedOrder && selectedOrder.id === orderId) {
-                    setSelectedOrder({ ...selectedOrder, status: newStatus });
+                    setSelectedOrder({ ...selectedOrder, orderStatus: newStatus });
                 }
             }
         } catch (err) {
@@ -136,30 +138,31 @@ export const AdminPanel = () => {
                                 {orders.map((order) => (
                                     <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                                         <td className="py-6 shrink-0">
-                                            <p className="font-bold text-[#2d3e34] text-xs">#{order.id.slice(0, 8).toUpperCase()}</p>
+                                            <p className="font-bold text-[#2d3e34] text-xs">#{order.id}</p>
                                         </td>
                                         <td className="py-6">
                                             <p className="text-xs font-medium text-[#2d3e34]/70">
-                                                {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                             </p>
                                         </td>
                                         <td className="py-6">
-                                            <p className="text-sm font-bold text-[#5c7c64]">₹{order.total_amount}</p>
+                                            <p className="text-sm font-bold text-[#5c7c64]">₹{order.totalAmount}</p>
                                         </td>
                                         <td className="py-6">
                                             <select 
-                                                value={order.status || 'Processing'} 
+                                                value={order.orderStatus || 'PLACED'} 
                                                 onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
                                                 className={`text-xs font-bold rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#5c7c64] border-0 cursor-pointer ${
-                                                    order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                                                    order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
+                                                    order.orderStatus === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                                                    order.orderStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
                                                     'bg-orange-100 text-orange-700'
                                                 }`}
                                             >
-                                                <option value="Processing">Processing</option>
-                                                <option value="Shipped">Shipped</option>
-                                                <option value="Delivered">Delivered</option>
-                                                <option value="Cancelled">Cancelled</option>
+                                                <option value="PLACED">Placed</option>
+                                                <option value="CONFIRMED">Confirmed</option>
+                                                <option value="SHIPPED">Shipped</option>
+                                                <option value="DELIVERED">Delivered</option>
+                                                <option value="CANCELLED">Cancelled</option>
                                             </select>
                                         </td>
                                         <td className="py-6 text-right">
@@ -195,7 +198,7 @@ export const AdminPanel = () => {
                         <div className="sticky top-0 bg-white/80 backdrop-blur-md p-6 border-b border-gray-100 flex justify-between items-center z-10">
                             <div>
                                 <h3 className="font-serif font-bold text-2xl text-[#2d3e34]">Order Details</h3>
-                                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mt-1">#{selectedOrder.id.slice(0,8).toUpperCase()}</p>
+                                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mt-1">#{selectedOrder.id}</p>
                             </div>
                             <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                                 <X className="w-6 h-6 text-gray-400" />
@@ -207,18 +210,18 @@ export const AdminPanel = () => {
                                 <div>
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#2d3e34]/50 mb-4">Shipping Info</p>
                                     <div className="bg-[#f8f5f0] p-5 rounded-2xl space-y-3">
-                                        <p className="font-bold text-[#2d3e34] text-sm">{selectedOrder.shipping_address?.name}</p>
+                                        <p className="font-bold text-[#2d3e34] text-sm">{selectedOrder.customerName}</p>
                                         <div className="flex items-start gap-2 text-xs text-gray-500 font-medium">
                                             <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-                                            <p>{selectedOrder.shipping_address?.address}, {selectedOrder.shipping_address?.city}, {selectedOrder.shipping_address?.state} - {selectedOrder.shipping_address?.pincode}</p>
+                                            <p>{selectedOrder.address}</p>
                                         </div>
                                         <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
                                             <Phone className="w-4 h-4 shrink-0" />
-                                            <p>{selectedOrder.shipping_address?.phone}</p>
+                                            <p>{selectedOrder.phone}</p>
                                         </div>
                                         <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
                                             <Mail className="w-4 h-4 shrink-0" />
-                                            <p>{selectedOrder.shipping_address?.email}</p>
+                                            <p>{selectedOrder.email}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -227,16 +230,16 @@ export const AdminPanel = () => {
                                     <div className="bg-[#f8f5f0] p-5 rounded-2xl space-y-3">
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs text-gray-500 font-bold uppercase">Total Amount</span>
-                                            <span className="text-lg font-bold text-[#5c7c64]">₹{selectedOrder.total_amount}</span>
+                                            <span className="text-lg font-bold text-[#5c7c64]">₹{selectedOrder.totalAmount}</span>
                                         </div>
                                         <div className="flex justify-between items-center border-t border-gray-200/50 pt-3">
                                             <span className="text-xs text-gray-500 font-bold uppercase">Payment ID</span>
-                                            <span className="text-[10px] font-bold font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">{selectedOrder.payment_id || 'N/A'}</span>
+                                            <span className="text-[10px] font-bold font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">{selectedOrder.paymentId || 'N/A'}</span>
                                         </div>
-                                        {selectedOrder.razorpay_order_id && (
+                                        {selectedOrder.razorpayOrderId && (
                                             <div className="flex justify-between items-center border-t border-gray-200/50 pt-3">
                                                 <span className="text-xs text-gray-500 font-bold uppercase">Razorpay Order</span>
-                                                <span className="text-[10px] font-bold font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">{selectedOrder.razorpay_order_id}</span>
+                                                <span className="text-[10px] font-bold font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">{selectedOrder.razorpayOrderId}</span>
                                             </div>
                                         )}
                                     </div>
@@ -246,22 +249,9 @@ export const AdminPanel = () => {
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#2d3e34]/50 mb-4">Order Items</p>
                                 <div className="space-y-4">
-                                    {Array.isArray(selectedOrder.items) && selectedOrder.items.map((item, idx) => (
-                                        <div key={idx} className="flex gap-4 items-center bg-white border border-gray-100 p-4 rounded-2xl">
-                                            <div className="w-16 h-16 rounded-xl bg-[#f8f5f0] overflow-hidden shrink-0">
-                                                <img src={item.image || '/images/MR Miracle.JPG'} alt={item.name} className="w-full h-full object-cover" />
-                                            </div>
-                                            <div className="flex-grow">
-                                                <h4 className="font-bold text-sm text-[#2d3e34]">{item.name}</h4>
-                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
-                                                    Qty: {item.quantity} • {item.weight}
-                                                </p>
-                                            </div>
-                                            <div className="text-right shrink-0">
-                                                <p className="font-bold text-sm text-[#2d3e34]">₹{item.price * item.quantity}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                    <p className="text-sm font-medium text-[#2d3e34] bg-white border border-gray-100 p-4 rounded-2xl leading-relaxed">
+                                        {selectedOrder.items}
+                                    </p>
                                 </div>
                             </div>
                         </div>
