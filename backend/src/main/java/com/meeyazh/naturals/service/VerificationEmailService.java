@@ -1,8 +1,6 @@
 package com.meeyazh.naturals.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,7 +12,7 @@ import java.util.Map;
 public class VerificationEmailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private EmailService emailService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -77,11 +75,6 @@ public class VerificationEmailService {
     }
 
     private void sendEmail(String to, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("meeyazhnaturals@gmail.com");
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
+        emailService.sendOrderNotification(to, subject, body);
     }
 }
