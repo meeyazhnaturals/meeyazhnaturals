@@ -248,6 +248,24 @@ export const Checkout = () => {
 
                 if (error) {
                     console.error("Error saving order:", error.message);
+                } else {
+                    // Send email notification to owner via backend
+                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+                    const itemsStr = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
+                    const addressStr = `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
+                    
+                    fetch(`${apiUrl}/api/payment/notify-order`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: `${formData.fname} ${formData.lname}`,
+                            email: formData.email,
+                            phone: formData.phone,
+                            address: addressStr,
+                            items: itemsStr,
+                            total: finalTotal
+                        })
+                    }).catch(err => console.error("Email notification failed:", err));
                 }
             }
             
