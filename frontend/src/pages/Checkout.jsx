@@ -254,7 +254,9 @@ export const Checkout = () => {
                     const itemsStr = cart.map(item => `${item.name} (x${item.quantity})`).join(', ');
                     const addressStr = `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
                     
-                    fetch(`${apiUrl}/api/payment/notify-order`, {
+                    console.log("NOTIFYING OWNER AT:", apiUrl);
+                    
+                    await fetch(`${apiUrl}/api/payment/notify-order`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -265,7 +267,8 @@ export const Checkout = () => {
                             items: itemsStr,
                             total: finalTotal
                         })
-                    }).catch(err => console.error("Email notification failed:", err));
+                    }).then(() => console.log("Email notification sent successfully!"))
+                      .catch(err => console.error("Email notification failed. If you see 'localhost' in the URL above, check your Vercel Environment Variables:", err));
                 }
             }
             
