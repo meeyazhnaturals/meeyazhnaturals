@@ -5,7 +5,7 @@ import {
     ChevronRight, MapPin, Truck,
     ShieldCheck, Lock, ShoppingBag, ArrowLeft,
     CheckCircle2, CreditCard as CardIcon, Phone,
-    Mail, User, Home, Zap
+    Mail, User, Home, Zap, Save, Loader2
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -27,6 +27,48 @@ export const Checkout = () => {
     });
     const [savedProfile, setSavedProfile] = useState(null);
     const [useSavedAddress, setUseSavedAddress] = useState(false);
+    const [savingAddress, setSavingAddress] = useState(false);
+
+    const handleSaveAddress = async () => {
+        try {
+            setSavingAddress(true);
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                alert('Please login to save your address');
+                return;
+            }
+
+            const { error } = await supabase
+                .from('profiles')
+                .upsert({
+                    id: session.user.id,
+                    full_name: `${formData.fname} ${formData.lname}`.trim(),
+                    phone: formData.phone,
+                    address: formData.address,
+                    city: formData.city,
+                    pincode: formData.pincode,
+                    state: formData.state,
+                });
+
+            if (error) throw error;
+            alert('Address saved to profile successfully!');
+            
+            // Refresh saved profile
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            setSavedProfile(profile);
+            setUseSavedAddress(true);
+        } catch (error) {
+            console.error('Error saving address:', error);
+            alert('Error saving address. Please try again.');
+        } finally {
+            setSavingAddress(false);
+        }
+    };
 
     React.useEffect(() => {
         const fetchProfile = async () => {
@@ -58,6 +100,11 @@ export const Checkout = () => {
         };
         fetchProfile();
     }, []);
+
+    // Scroll to top on step change
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [step]);
 
     const toggleAddressSource = (source) => {
         if (source === 'saved') {
@@ -203,23 +250,43 @@ export const Checkout = () => {
                     <button 
                         type="submit" 
                         form="checkout-form"
-                        className="w-full btn-premium bg-[#2d3e34] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.1)] transform active:scale-95 transition-all text-xl"
+                        className="w-full bg-[#2d3e34] text-white py-6 rounded-full font-bold text-lg shadow-xl hover:bg-[#1f2b24] transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
                     >
-                        Continue to Shipping <ChevronRight className="w-5 h-5" />
+                        Continue to Shipping <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                 );
             case 2:
                 return (
                     <div className="flex gap-4">
-                        <button onClick={() => setStep(1)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
-                        <button onClick={() => setStep(3)} className="w-2/3 btn-premium bg-[#2d3e34] text-white py-6 flex items-center justify-center gap-3">Continue to Payment <ChevronRight className="w-5 h-5" /></button>
+                        <button 
+                            onClick={() => setStep(1)} 
+                            className="flex-1 bg-white border-2 border-gray-100 text-gray-400 py-6 rounded-full font-bold text-xs uppercase tracking-widest hover:text-[#2d3e34] hover:border-[#2d3e34]/20 transition-all flex items-center justify-center gap-2 group"
+                        >
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back 
+                        </button>
+                        <button 
+                            onClick={() => setStep(3)} 
+                            className="flex-[2] bg-[#2d3e34] text-white py-6 rounded-full font-bold text-lg shadow-xl hover:bg-[#1f2b24] transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+                        >
+                            Continue to Payment <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </button>
                     </div>
                 );
             case 3:
                 return (
                     <div className="flex gap-4">
-                        <button onClick={() => setStep(2)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
-                        <button onClick={displayRazorpay} className="w-2/3 btn-premium bg-[#5c7c64] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(92,124,100,0.3)] transform active:scale-95 transition-all text-xl">Pay with Razorpay <Lock className="w-5 h-5" /></button>
+                        <button 
+                            onClick={() => setStep(2)} 
+                            className="flex-1 bg-white border-2 border-gray-100 text-gray-400 py-6 rounded-full font-bold text-xs uppercase tracking-widest hover:text-[#2d3e34] hover:border-[#2d3e34]/20 transition-all flex items-center justify-center gap-2 group"
+                        >
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back 
+                        </button>
+                        <button 
+                            onClick={displayRazorpay} 
+                            className="flex-[2] bg-[#5c7c64] text-white py-6 rounded-full font-bold text-lg shadow-[0_20px_40px_rgba(92,124,100,0.2)] hover:bg-[#4a6452] transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+                        >
+                            Pay with Razorpay <Lock className="w-5 h-5" />
+                        </button>
                     </div>
                 );
             default:
@@ -271,7 +338,8 @@ export const Checkout = () => {
         }
     };
 
-    const shippingCharge = 60;
+    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+    const shippingCharge = totalItems >= 2 ? 0 : 60;
     const finalTotal = cartTotal + shippingCharge;
 
     const renderStepIndicator = () => (
@@ -309,7 +377,7 @@ export const Checkout = () => {
     }
 
     return (
-        <div className="bg-[#f8f5f0] min-h-screen pb-32 pt-32">
+        <div className="bg-[#f8f5f0] min-h-screen pb-32 pt-20 md:pt-24">
             <div className="container mx-auto px-6 max-w-6xl">
 
                 <div className="flex flex-col lg:flex-row gap-20">
@@ -406,6 +474,22 @@ export const Checkout = () => {
                                                     className="w-full bg-white border border-gray-100 rounded-[1.5rem] p-6 focus:ring-4 focus:ring-[#5c7c64]/5 outline-none transition-all shadow-sm" 
                                                 />
                                             </div>
+
+                                            <div className="md:col-span-2 pt-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSaveAddress}
+                                                    disabled={savingAddress}
+                                                    className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#5c7c64] font-bold rounded-full border-2 border-[#5c7c64]/10 hover:border-[#5c7c64] hover:bg-[#f4f7f5] transition-all transform active:scale-95 disabled:opacity-50 text-xs uppercase tracking-widest shadow-sm"
+                                                >
+                                                    {savingAddress ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <Save className="w-4 h-4" />
+                                                    )}
+                                                    Save address for later
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.form>
@@ -419,25 +503,36 @@ export const Checkout = () => {
                                     <div>
                                         <h2 className="font-serif text-3xl font-bold text-[#2d3e34] mb-8">Shipping Method</h2>
                                         <div className="space-y-4">
-                                            <div className="bg-white border-2 border-[#2d3e34] rounded-[2rem] p-8 flex items-center justify-between shadow-lg">
-                                                <div className="flex items-center gap-6">
-                                                    <div className="w-12 h-12 bg-[#f8f5f0] rounded-full flex items-center justify-center text-[#2d3e34]"><Truck className="w-6 h-6" /></div>
+                                            <div className="bg-white border-2 border-[#2d3e34] rounded-[2rem] p-10 flex flex-col md:flex-row items-center justify-between shadow-xl relative overflow-hidden group">
+                                                <div className="absolute top-0 left-0 w-2 h-full bg-[#5c7c64]"></div>
+                                                <div className="flex items-center gap-8">
+                                                    <div className="w-20 h-20 bg-[#f4f7f5] rounded-3xl flex items-center justify-center text-[#5c7c64] group-hover:scale-110 transition-transform duration-500">
+                                                        <Truck className="w-10 h-10" />
+                                                    </div>
                                                     <div>
-                                                        <h4 className="font-bold text-[#2d3e34]">Premium Express</h4>
-                                                        <p className="text-sm text-[#2d3e34]/50">3-5 Business Days</p>
+                                                        <h4 className="font-serif text-2xl font-bold text-[#2d3e34]">
+                                                            {shippingCharge === 0 ? 'Complimentary Shipping' : 'Premium Express Delivery'}
+                                                        </h4>
+                                                        <p className="text-[#2d3e34]/50 font-medium">
+                                                            {shippingCharge === 0 
+                                                                ? 'As a token of wellness for your multi-item order.' 
+                                                                : 'Handled with extra care for your natural essentials.'}
+                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-2 text-[#5c7c64] font-bold text-[10px] uppercase tracking-widest">
+                                                            <Zap className="w-4 h-4" /> Delivered in 3-5 business days
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <span className="font-bold text-lg">₹{shippingCharge}</span>
-                                            </div>
-                                            <div className="bg-white/50 border border-gray-100 rounded-[2rem] p-8 flex items-center justify-between opacity-50 cursor-not-allowed">
-                                                <div className="flex items-center gap-6">
-                                                    <div className="w-12 h-12 bg-[#f8f5f0] rounded-full flex items-center justify-center text-gray-400"><ShoppingBag className="w-6 h-6" /></div>
-                                                    <div>
-                                                        <h4 className="font-bold">Standard Delivery</h4>
-                                                        <p className="text-sm">7-10 Business Days</p>
-                                                    </div>
+                                                <div className="mt-8 md:mt-0 text-center md:text-right">
+                                                    <span className={`text-4xl font-bold ${shippingCharge === 0 ? 'text-[#5c7c64]' : 'text-[#2d3e34]'}`}>
+                                                        {shippingCharge === 0 ? 'FREE' : `₹${shippingCharge}`}
+                                                    </span>
+                                                    {shippingCharge > 0 && (
+                                                        <p className="text-[10px] font-bold text-[#5c7c64] uppercase tracking-widest mt-2">
+                                                            Buy 2+ items for FREE shipping
+                                                        </p>
+                                                    )}
                                                 </div>
-                                                <span className="font-bold text-lg">Free</span>
                                             </div>
                                         </div>
                                     </div>
@@ -449,18 +544,14 @@ export const Checkout = () => {
                                     key="step3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
                                     className="space-y-12"
                                 >
-                                    <div>
-                                        <h2 className="font-serif text-3xl font-bold text-[#2d3e34] mb-8">Secure Payment</h2>
-                                        <div className="bg-white border-2 border-[#2d3e34] rounded-[2rem] p-8 flex items-center justify-between shadow-lg">
-                                            <div className="flex items-center gap-6">
-                                                <div className="w-12 h-12 bg-[#f8f5f0] rounded-full flex items-center justify-center text-[#2d3e34]"><Lock className="w-6 h-6" /></div>
-                                                <div>
-                                                    <h4 className="font-bold text-[#2d3e34]">Razorpay Secure</h4>
-                                                    <p className="text-sm text-[#2d3e34]/50">Pay via UPI, Cards, Wallets, or NetBanking</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex bg-[#2d3e34] text-white px-4 py-2 rounded-xl text-xs font-bold tracking-widest uppercase">Razorpay</div>
+                                    <div className="bg-white rounded-[2.5rem] p-12 shadow-sm border border-gray-50 flex flex-col items-center text-center">
+                                        <div className="w-20 h-20 bg-[#f4f7f5] rounded-full flex items-center justify-center text-[#5c7c64] mb-8">
+                                            <ShieldCheck className="w-10 h-10" />
                                         </div>
+                                        <h2 className="font-serif text-3xl font-bold text-[#2d3e34] mb-4">Secure Payment</h2>
+                                        <p className="text-[#2d3e34]/50 max-w-sm mx-auto leading-relaxed italic">
+                                            "You are moments away from your natural wellness journey."
+                                        </p>
                                     </div>
                                 </motion.div>
                             )}
