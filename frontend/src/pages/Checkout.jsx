@@ -187,9 +187,40 @@ export const Checkout = () => {
     }
 
     const handleNext = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setStep(step + 1);
         window.scrollTo(0, 0);
+    };
+
+    const renderActions = () => {
+        switch (step) {
+            case 1:
+                return (
+                    <button 
+                        type="submit" 
+                        form="checkout-form"
+                        className="w-full btn-premium bg-[#2d3e34] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.1)] transform active:scale-95 transition-all text-xl"
+                    >
+                        Continue to Shipping <ChevronRight className="w-5 h-5" />
+                    </button>
+                );
+            case 2:
+                return (
+                    <div className="flex gap-4">
+                        <button onClick={() => setStep(1)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
+                        <button onClick={() => setStep(3)} className="w-2/3 btn-premium bg-[#2d3e34] text-white py-6 flex items-center justify-center gap-3">Continue to Payment <ChevronRight className="w-5 h-5" /></button>
+                    </div>
+                );
+            case 3:
+                return (
+                    <div className="flex gap-4">
+                        <button onClick={() => setStep(2)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
+                        <button onClick={displayRazorpay} className="w-2/3 btn-premium bg-[#5c7c64] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(92,124,100,0.3)] transform active:scale-95 transition-all text-xl">Pay with Razorpay <Lock className="w-5 h-5" /></button>
+                    </div>
+                );
+            default:
+                return null;
+        }
     };
 
     const handleFinalize = async (paymentId, razorpayOrderId) => {
@@ -279,6 +310,7 @@ export const Checkout = () => {
                                 <motion.form
                                     key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
                                     onSubmit={handleNext}
+                                    id="checkout-form"
                                     className="space-y-10"
                                 >
                                     <div>
@@ -365,12 +397,6 @@ export const Checkout = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <button 
-                                        type="submit" 
-                                        className="w-full btn-premium bg-[#2d3e34] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.1)] transform active:scale-95 transition-all text-xl"
-                                    >
-                                        Continue to Shipping <ChevronRight className="w-5 h-5" />
-                                    </button>
                                 </motion.form>
                             )}
 
@@ -404,10 +430,6 @@ export const Checkout = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <button onClick={() => setStep(1)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
-                                        <button onClick={() => setStep(3)} className="w-2/3 btn-premium bg-[#2d3e34] text-white py-6 flex items-center justify-center gap-3">Continue to Payment <ChevronRight className="w-5 h-5" /></button>
-                                    </div>
                                 </motion.div>
                             )}
 
@@ -429,13 +451,14 @@ export const Checkout = () => {
                                             <div className="flex bg-[#2d3e34] text-white px-4 py-2 rounded-xl text-xs font-bold tracking-widest uppercase">Razorpay</div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <button onClick={() => setStep(2)} className="w-1/3 border border-gray-200 py-6 rounded-2xl font-bold text-sm tracking-widest uppercase hover:bg-white transition-all">Back</button>
-                                        <button onClick={displayRazorpay} className="w-2/3 btn-premium bg-[#5c7c64] text-white py-6 flex items-center justify-center gap-3 shadow-[0_20px_40px_rgba(92,124,100,0.3)] transform active:scale-95 transition-all text-xl">Pay with Razorpay <Lock className="w-5 h-5" /></button>
-                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        {/* Actions for Desktop */}
+                        <div className="hidden lg:block mt-20">
+                            {renderActions()}
+                        </div>
                     </div>
 
                     {/* Order Summary Sidebar */}
@@ -469,7 +492,11 @@ export const Checkout = () => {
                                     <span className="text-3xl font-bold text-[#2d3e34] tracking-tighter">₹{finalTotal}</span>
                                 </div>
                             </div>
+                        </div>
 
+                        {/* Actions for Mobile */}
+                        <div className="block lg:hidden mt-12">
+                            {renderActions()}
                         </div>
                     </div>
                 </div>
