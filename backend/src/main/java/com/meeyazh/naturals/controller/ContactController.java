@@ -1,9 +1,8 @@
 package com.meeyazh.naturals.controller;
 
+import com.meeyazh.naturals.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.Map;
 public class ContactController {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private EmailService emailService;
 
     @PostMapping("/send")
     public ResponseEntity<Map<String, String>> sendContactEmail(@RequestBody Map<String, String> payload) {
@@ -24,22 +23,19 @@ public class ContactController {
             String subject = payload.get("subject");
             String message = payload.get("message");
 
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo("meeyazhnaturals@gmail.com");
-            mailMessage.setSubject("Contact Form: " + subject);
-            mailMessage.setText(
+            String body = String.format(
                 "New Contact Form Submission\n" +
                 "===========================\n\n" +
-                "Name: " + name + "\n" +
-                "Email: " + email + "\n" +
-                "Subject: " + subject + "\n\n" +
-                "Message:\n" + message + "\n\n" +
+                "Name: %s\n" +
+                "Email: %s\n" +
+                "Subject: %s\n\n" +
+                "Message:\n%s\n\n" +
                 "---\n" +
-                "Sent from Meeyazh Naturals Website"
+                "Sent from Meeyazh Naturals Website",
+                name, email, subject, message
             );
-            mailMessage.setReplyTo(email);
 
-            mailSender.send(mailMessage);
+            emailService.sendOrderNotification("meeyazhnaturals@gmail.com", "Contact Form: " + subject, body);
 
             return ResponseEntity.ok(Map.of("status", "success", "message", "Email sent successfully"));
         } catch (Exception e) {
