@@ -4,14 +4,12 @@ import { ChevronLeft, ChevronRight, Search, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
 
-const CATEGORIES = ["All", "Health Mix", "Tooth Powder", "Bath Powder", "Soap Bar"];
 
 export const LandingPage = () => {
     const [activeSlide, setActiveSlide] = useState(0);
     const navigate = useNavigate();
 
     const [products, setProducts] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState("Newest");
@@ -25,7 +23,7 @@ export const LandingPage = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [selectedCategory, sortBy]);
+    }, [sortBy]);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -38,9 +36,6 @@ export const LandingPage = () => {
         ];
 
         let filtered = localProducts;
-        if (selectedCategory !== "All") {
-            filtered = filtered.filter(p => p.category === selectedCategory);
-        }
 
         if (sortBy === "Price: Low to High") filtered.sort((a, b) => a.price - b.price);
         else if (sortBy === "Price: High to Low") filtered.sort((a, b) => b.price - a.price);
@@ -127,17 +122,6 @@ export const LandingPage = () => {
                             </div>
                         </div>
 
-                        <div className="flex overflow-x-auto gap-3 pb-8 no-scrollbar">
-                            {CATEGORIES.map(cat => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setSelectedCategory(cat)}
-                                    className={`whitespace-nowrap px-8 py-3 md:px-10 md:py-4 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-[#2d3e34] text-white shadow-xl' : 'bg-white text-[#2d3e34]/50 border border-gray-100 hover:border-[#2d3e34]/20 hover:text-[#2d3e34]'}`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
 
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-32">
@@ -164,7 +148,7 @@ export const LandingPage = () => {
                         {!loading && filteredProducts.length === 0 && (
                             <div className="text-center py-32 bg-white rounded-[4rem] border-2 border-dashed border-gray-100">
                                 <p className="font-serif text-2xl text-gray-400">We couldn't find what you're looking for.</p>
-                                <button onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }} className="mt-6 text-[#5c7c64] font-bold uppercase tracking-widest text-xs hover:underline underline-offset-8">View all products</button>
+                                <button onClick={() => { setSearchQuery(""); }} className="mt-6 text-[#5c7c64] font-bold uppercase tracking-widest text-xs hover:underline underline-offset-8">View all products</button>
                             </div>
                         )}
                     </div>
