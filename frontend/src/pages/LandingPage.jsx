@@ -17,15 +17,10 @@ export const LandingPage = () => {
     const [sortBy, setSortBy] = useState("Newest");
 
     const heroImages = [
-        '/images/ABC Mix.PNG',
-        '/images/Basil Bliss Mix.PNG',
-        '/images/Citrus Glow Mix.PNG',
-        '/images/Curry Leaf Mix.PNG',
-        '/images/Hibiscus Mix.PNG',
-        '/images/MR Miracle Mix.PNG',
-        '/images/Neemmune Mix.PNG',
-        '/images/Power House Mix.PNG',
-        '/images/Rose Rush Mix.PNG'
+        '/images/Power House front.png',
+        '/images/Moringa powder .png',
+        '/images/Pirandai powder.png',
+        '/images/Karuvepillai powder.png'
     ];
 
     useEffect(() => {
@@ -36,21 +31,10 @@ export const LandingPage = () => {
         setLoading(true);
 
         const localProducts = [
-            { id: 1, name: 'ABC Mix', price: 595, oldPrice: 799, weight: '200g', rating: 4.8, description: 'Natural iron booster with apple, beetroot, and carrot.', image: '/images/ABC Mix.PNG', category: 'Health Mix' },
-            { id: 2, name: 'Basil Bliss Mix', price: 212, oldPrice: 499, weight: '200g', rating: 4.9, description: 'Soothing blend with holy basil and sprouted millets.', image: '/images/Basil Bliss Mix.PNG', category: 'Health Mix' },
-            { id: 3, name: 'Curry Leaf Mix', price: 170, oldPrice: 399, weight: '200g', rating: 4.8, description: 'Superfood powder for hair and digestive health.', image: '/images/Curry Leaf Mix.PNG', category: 'Health Mix' },
-            { id: 4, name: 'Hibiscus Mix', price: 297, oldPrice: 499, weight: '200g', rating: 4.6, description: 'Refreshing detox blend with hibiscus and spices.', image: '/images/Hibiscus Mix.PNG', category: 'Health Mix' },
-            { id: 5, name: 'MR Miracle Mix', price: 255, oldPrice: 499, weight: '200g', rating: 4.7, description: 'Traditional multi-grain health mix for the family.', image: '/images/MR Miracle Mix.PNG', category: 'Health Mix' },
-            { id: 6, name: 'Neemmune Mix', price: 399, oldPrice: 799, weight: '200g', rating: 4.7, description: 'Immunity boosting neem blend.', image: '/images/Neemmune Mix.PNG', category: 'Health Mix' },
-            { id: 7, name: 'Power House Mix', price: 297, oldPrice: 499, weight: '200g', rating: 5.0, description: 'Ultimate energy blend for active lifestyles.', image: '/images/Power House Mix.PNG', category: 'Health Mix' },
-            { id: 8, name: 'Rose Rush Mix', price: 340, oldPrice: 599, weight: '200g', rating: 4.8, description: 'Calming and aromatic rose mix.', image: '/images/Rose Rush Mix.PNG', category: 'Health Mix' },
-            { id: 9, name: 'Charcoal Tooth Powder', price: 150, oldPrice: 299, weight: '50g', rating: 4.7, description: 'Activated charcoal tooth powder for deep cleansing and whitening.', image: '/images/Charcoal Tooth Powder.PNG', category: 'Tooth Powder' },
-            { id: 10, name: 'Herbal Tooth Powder', price: 130, oldPrice: 249, weight: '50g', rating: 4.8, description: 'Traditional herbal tooth powder for strong gums and fresh breath.', image: '/images/Herbal Tooth Powder.PNG', category: 'Tooth Powder' },
-            { id: 11, name: 'Flowrain Bath Powder', price: 199, oldPrice: 399, weight: '100g', rating: 4.9, description: 'Natural bath powder with aromatic florals for soft and glowing skin.', image: '/images/Flowrain Bath Powder.PNG', category: 'Bath Powder' },
-            { id: 12, name: 'Lavender Bath Salt', price: 249, oldPrice: 499, weight: '150g', rating: 5.0, description: 'Calming lavender bath salt to relax your muscles and soothe your senses.', image: '/images/Lavender Bath Salt.PNG', category: 'Bath Powder' },
-            { id: 13, name: 'Potato Soap Bar', price: 145, oldPrice: 249, weight: '100g', rating: 4.8, description: 'Natural brightening soap bar made with fresh potato extracts to reduce dark spots.', image: '/images/Potato Soap Bar.PNG', category: 'Soap Bar' },
-            { id: 14, name: 'Tomato Soap Bar', price: 145, oldPrice: 249, weight: '100g', rating: 4.7, description: 'Refresh your skin with tomato extracts for a natural glow and tanning removal.', image: '/images/Tomato Soap Bar.PNG', category: 'Soap Bar' },
-            { id: 15, name: 'Kuppainmeni Soap Bar', price: 165, oldPrice: 299, weight: '100g', rating: 4.9, description: 'Traditional herbal soap bar with Kuppainmeni extracts for treating skin infections and allergies.', image: '/images/Kuppaimeni Soap Bar.PNG', category: 'Soap Bar' },
+            { id: 1, name: 'Power House', price: 297, oldPrice: 499, weight: '200g', rating: 5.0, description: 'A nutrient-dense blend designed to fuel your body with pure goodness.', image: '/images/Power House front.png', category: 'Health Mix' },
+            { id: 2, name: 'Moringa Powder', price: 150, oldPrice: 299, weight: '100g', rating: 4.8, description: 'Pure, organic Moringa powder packed with vitamins and minerals for your daily boost.', image: '/images/Moringa powder .png', category: 'Health Mix' },
+            { id: 3, name: 'Pirandai Powder', price: 180, oldPrice: 350, weight: '100g', rating: 4.7, description: 'Traditional Pirandai powder known for its amazing health benefits and digestive support.', image: '/images/Pirandai powder.png', category: 'Health Mix' },
+            { id: 4, name: 'Karuvepillai Powder', price: 170, oldPrice: 399, weight: '100g', rating: 4.9, description: 'Fragrant and fresh curry leaf powder, ideal for hair health and digestive wellness.', image: '/images/Karuvepillai powder.png', category: 'Health Mix' },
         ];
 
         let filtered = localProducts;
