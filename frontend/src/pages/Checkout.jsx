@@ -511,27 +511,22 @@ export const Checkout = () => {
                                                     </div>
                                                     <div>
                                                         <h4 className="font-serif text-2xl font-bold text-[#2d3e34]">
-                                                            {shippingCharge === 0 ? 'Complimentary Shipping' : 'Premium Express Delivery'}
+                                                            {shippingCharge === 0 ? 'Free Shipping' : 'Standard Shipping'}
                                                         </h4>
-                                                        <p className="text-[#2d3e34]/50 font-medium">
+                                                        <p className="text-[#2d3e34]/50 font-medium mt-1">
                                                             {shippingCharge === 0 
-                                                                ? 'As a token of wellness for your multi-item order.' 
-                                                                : 'Handled with extra care for your natural essentials.'}
+                                                                ? 'Enjoy free delivery on your multi-item order.' 
+                                                                : '₹60 shipping fee for 1 item.'}
                                                         </p>
-                                                        <div className="flex items-center gap-2 mt-2 text-[#5c7c64] font-bold text-[10px] uppercase tracking-widest">
-                                                            <Zap className="w-4 h-4" /> Delivered in 3-5 business days
-                                                        </div>
+                                                        <p className="text-[10px] font-bold text-[#5c7c64] uppercase tracking-widest mt-4">
+                                                            Buy 2 or more items to get FREE shipping
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div className="mt-8 md:mt-0 text-center md:text-right">
                                                     <span className={`text-4xl font-bold ${shippingCharge === 0 ? 'text-[#5c7c64]' : 'text-[#2d3e34]'}`}>
                                                         {shippingCharge === 0 ? 'FREE' : `₹${shippingCharge}`}
                                                     </span>
-                                                    {shippingCharge > 0 && (
-                                                        <p className="text-[10px] font-bold text-[#5c7c64] uppercase tracking-widest mt-2">
-                                                            Buy 2+ items for FREE shipping
-                                                        </p>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
