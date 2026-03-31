@@ -54,7 +54,7 @@ export const Signup = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-6rem)] md:min-h-screen bg-[#f8f5f0] flex flex-col justify-center items-center p-6 pt-4 md:pt-20 pb-20 md:pb-32">
+        <div className="min-h-screen bg-[#f8f5f0] flex flex-col justify-center items-center p-6 pt-28 md:pt-32 pb-24 md:pb-32">
             <Link to="/" className="fixed top-8 left-8 flex items-center gap-2 font-bold text-[#2d3e34]/60 hover:text-[#2d3e34] transition-all group">
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Nature
             </Link>
