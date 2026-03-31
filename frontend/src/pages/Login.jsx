@@ -61,8 +61,7 @@ export const Login = () => {
             >
                 <div className="text-center mb-12">
                     <span className="text-[10px] font-bold text-[#5c7c64] uppercase tracking-[0.3em]">Meeyazh Naturals</span>
-                    <h1 className="font-serif text-4xl md:text-5xl font-bold text-[#2d3e34] mt-2">Welcome Back.</h1>
-                    <p className="text-[#2d3e34]/50 mt-4 font-medium">Continue your journey to holistic health.</p>
+                    <h1 className="font-serif text-4xl md:text-5xl font-bold text-[#2d3e34] mt-2">Welcome Back</h1>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-6">
