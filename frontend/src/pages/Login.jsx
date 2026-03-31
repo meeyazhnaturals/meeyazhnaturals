@@ -128,7 +128,7 @@ export const Login = () => {
                     <button
                         type="button"
                         onClick={loginWithGoogle}
-                        className="w-full bg-white border border-gray-200 text-[#2d3e34] py-5 rounded-2xl font-bold shadow-sm hover:shadow-md hover:bg-gray-50 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+                        className="w-full bg-gray-50 border-2 border-gray-300 text-[#2d3e34] py-5 rounded-2xl font-bold shadow-sm hover:shadow-md hover:bg-gray-100 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path
